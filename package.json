@@ -1,6 +1,6 @@
 {
   "name": "series.js",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Time Series utilities",
   "main": "lib/series.js",
   "directories": {
@@ -9,7 +9,7 @@
   "scripts": {
     "test": "mocha --compilers coffee:coffee-script -R spec test/*_test.coffee"
   },
-  "repository": "",
+  "repository": "https://github.com/muddydixon/series.js.git",
   "author": "muddydixon muddydixon@gmail.com",
   "license": "Apache License Version 2.0",
   "dependencies": {
