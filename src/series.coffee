@@ -214,9 +214,8 @@ module.exports = class Series extends Array
     sort = null
 
     aggr = (data, args...)->
-
       len = data.length
-      
+
       keyvals = {}
       for i in [0..len - 1]
         k = key(data[i])
@@ -236,13 +235,25 @@ module.exports = class Series extends Array
       else
         aggregated.sort sort
 
+    ['minute', 'hour', 'day', 'week', 'month', 'year'].forEach (span)->
+      aggr[span] = (_t)->
+        if _t
+          Series.t(_t)
+        aggr.key(Series[span])
 
     aggr.key = (_key)->
-      key = _key
+      if typeof _key is 'function'
+        key = _key
+      else if typeof _key is 'string'
+        key = (d)-> d[key]
+      else
+        throw new Error('key should be function or attribution')
       this
     aggr.sort = (_sort)->
       if typeof _sort is 'function'
         sort = _sort
+      else
+        throw new Error('key should be function or attribution')
       this
     aggr
   #
@@ -391,26 +402,32 @@ do (Series)->
     Z: (d)-> d.getTimezoneOffset(),
     "%": ()-> "%"
     
-  normal = (msec)->
-    imsec = 1 / msec
-    (time)->
-      time = time.getTime() if time instanceof Date
-      new Date (0|time * imsec) * msec
-   
-  minute = normal(60000)
-  hour   = normal(3600000)
+  minute = (time)->
+    t = Series.t()
+    time = new Date(t(time)) unless time instanceof Date
+    new Date(time.getFullYear(), time.getMonth(), time.getDate(),
+      time.getHours(), time.getMinutes(), 0)
+  hour   = (time)->
+    t = Series.t()
+    time = new Date(t(time)) unless time instanceof Date
+    new Date(time.getFullYear(), time.getMonth(), time.getDate(),
+      time.getHours(), 0, 0)
   day    = (time)->
-    time = new Date(time) unless time instanceof Date
+    t = Series.t()
+    time = new Date(t(time)) unless time instanceof Date
     new Date(time.getFullYear(), time.getMonth(), time.getDate(), 0, 0, 0)
   week   = (time)->
-    time = new Date(time) unless time instanceof Date
+    t = Series.t()
+    time = new Date(t(time)) unless time instanceof Date
     d = time.getDay()
     new Date(time.getFullYear(), time.getMonth(), time.getDate() - d, 0, 0, 0)
   month  = (time)->
-    time = new Date(time) unless time instanceof Date
+    t = Series.t()
+    time = new Date(t(time)) unless time instanceof Date
     new Date(time.getFullYear(), time.getMonth(), 1, 0, 0, 0)
   year   = (time)->
-    time = new Date(time) unless time instanceof Date
+    t = Series.t()
+    time = new Date(t(time)) unless time instanceof Date
     new Date(time.getFullYear(), 0, 1, 0, 0, 0)
 
   Series.minute = minute

@@ -1,6 +1,6 @@
 {
   "name": "series.js",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Time Series utilities",
   "main": "lib/series.js",
   "directories": {
