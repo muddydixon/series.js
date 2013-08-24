@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf8">
+    <title>Series.js</title>
+  </head>
+  <body>
+    <div>
+      <table id="table"></table>
+    </div>
+    <script type="text/javascript" charset="utf8" src="../bower_components/jquery/jquery.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="../lib/series.js"></script>
+    <script type="text/javascript" charset="utf8">
+      (function(){
+        var data = Series.range(0, 20).map(function(d){
+          return {time: new Date(2013, 0, 1, d),
+                  v: 0|Math.random() * 100};
+        });
+        s = new Series().y(function(d){ return d.v; });
+        data.forEach(function(d){
+          s.put(d)
+        });
+
+        ['sum', 'mean', 'stdev', 'median'].forEach(function(method){
+          $('#table').append(
+            $('<tr>').append(
+              $('<td>').text(method),
+              $('<td>').text(s[method]())
+            )
+          );
+        });
+      })();
+    </script>
+  </body>
+</html>

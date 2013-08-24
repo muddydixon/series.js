@@ -5,7 +5,7 @@ module.exports = (grunt)->
     coffee:
       lib:
         options:
-          bare: true
+          bare: false
         files:
           'lib/series.js': 'src/series.coffee'
     

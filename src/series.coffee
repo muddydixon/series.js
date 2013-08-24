@@ -1,4 +1,4 @@
-module.exports = class Series extends Array
+class Series extends Array
   @_t: (d)-> d
   @_y: (d)-> d
   #
@@ -52,7 +52,7 @@ module.exports = class Series extends Array
   #
   @range: (begin, end, step =1)->
     arr = []
-    v = start
+    v = begin
     while v < end
       arr.push v
       v += step
@@ -496,3 +496,8 @@ class Series.Nest
       
     map = @_map data, 0
     @_entries map, 0
+
+if module?.exports
+  module.exports = Series
+else
+  this.Series = Series
