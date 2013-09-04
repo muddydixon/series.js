@@ -241,11 +241,9 @@ class Series extends Array
               Series.y(y).t(t)
               c(values, args)
         else
-          o = {}
           for ck, c of calc
             Series.y(y).t(t)
-            o[ck] = c(values, args)
-          obj[yKey] = o
+            obj[ck] = c(values, args)
           
         aggregated.push obj
 
