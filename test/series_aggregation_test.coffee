@@ -45,6 +45,32 @@ describe 'series', ->
           ]
         Series.cleanAccessor()
 
+        expect(Series.y((d)-> d.v)
+          .aggregation([Series.sum, Series.sumsq]).sort((a, b)-> b.t - a.t)
+          .key((d)-> d.t.getDay())(dat)).to.be.deep.eql [
+            {t: "6", y: [4, 16]}
+            {t: "5", y: [3, 9]}
+            {t: "4", y: [11, 85]}
+            {t: "3", y: [9, 65]}
+            {t: "2", y: [7, 49]}
+            {t: "1", y: [6, 36]}
+            {t: "0", y: [5, 25]}
+          ]
+        Series.cleanAccessor()
+
+        expect(Series.y((d)-> d.v)
+          .aggregation({sum: Series.sum, sumsq: Series.sumsq}).sort((a, b)-> b.t - a.t)
+          .key((d)-> d.t.getDay())(dat)).to.be.deep.eql [
+            {t: "6", y: {sum: 4, sumsq: 16}}
+            {t: "5", y: {sum: 3, sumsq: 9}}
+            {t: "4", y: {sum: 11, sumsq: 85}}
+            {t: "3", y: {sum: 9, sumsq: 65}}
+            {t: "2", y: {sum: 7, sumsq: 49}}
+            {t: "1", y: {sum: 6, sumsq: 36}}
+            {t: "0", y: {sum: 5, sumsq: 25}}
+          ]
+        Series.cleanAccessor()
+
       it "time aggregation minute", ->
         for d, i in Series.y((d)-> d.y).aggregation(Series.sum).minute((d)-> d.t)(dat3)
           expect(d).have.property 't', "#{new Date(2013, 0, 1, 0, i)}"

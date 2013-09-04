@@ -1,6 +1,7 @@
 class Series extends Array
   @_t: (d)-> d
   @_y: (d)-> d
+  @_ys: null
   #
   # ## Accessor
   #
@@ -21,6 +22,9 @@ class Series extends Array
       return Series._y
     if typeof accessor is 'function'
       Series._y = accessor
+    else if accessor instanceof Array
+      Series._y = accessor[0]
+      Series._ys = accessor
     else if typeof accessor is 'string'
       Series._yKey = accessor
       Series._y = (d)-> d[accessor]
@@ -45,6 +49,7 @@ class Series extends Array
   @cleanAccessor: ()->
     Series._t = (d)-> d
     Series._y = (d)-> d
+    Series._ys = null
     this
 
   #
@@ -205,6 +210,7 @@ class Series extends Array
   # ## aggregation
   #
   @aggregation: (calc)->
+    calc = [calc] if typeof calc is 'function'
     tKey = Series._tKey or 't'
     yKey = Series._yKey or 'y'
     y = Series.y()
@@ -224,10 +230,23 @@ class Series extends Array
 
       aggregated = []
       for k, values of keyvals
-        Series.y(y).t(t)
         obj = {}
         obj[tKey] = k
-        obj[yKey] = calc values, args
+        if calc instanceof Array
+          if calc.length is 1
+            Series.y(y).t(t)
+            obj[yKey] = calc[0](values, args)
+          else
+            obj[yKey] = calc.map (c)->
+              Series.y(y).t(t)
+              c(values, args)
+        else
+          o = {}
+          for ck, c of calc
+            Series.y(y).t(t)
+            o[ck] = c(values, args)
+          obj[yKey] = o
+          
         aggregated.push obj
 
       if not sort?
