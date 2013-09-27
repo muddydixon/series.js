@@ -16,7 +16,7 @@ class Series extends Array
     else
       throw new Error 't accessor should be function'
     this
-    
+
   @y: (accessor)->
     if not accessor?
       return Series._y
@@ -31,21 +31,21 @@ class Series extends Array
     else
       throw new Error 'y accessor should be function'
     this
-    
+
   @ts: (data)->
     t = Series.t()
     res = []
     for d in data
       res.push t(d)
     res
-    
+
   @ys: (data)->
     y = Series.y()
     res = []
     for d in data
       res.push y(d)
     res
-    
+
   @cleanAccessor: ()->
     Series._t = (d)-> d
     Series._y = (d)-> d
@@ -82,7 +82,7 @@ class Series extends Array
 
   #
   # ## Hash methods
-  # 
+  #
   @keys: (obj)->
     (k for k of obj)
   @vals: (obj)->
@@ -92,11 +92,11 @@ class Series extends Array
 
   #
   # ### statistical methods
-  # 
+  #
   @lag: (data, lag = 1)->
     y = Series.y()
     Series.cleanAccessor()
-    
+
     len = data.length
     res = [null]
     for i in [0..len - 2]
@@ -105,7 +105,7 @@ class Series extends Array
   @sum: Series.sum=(data)->
     y = Series.y()
     Series.cleanAccessor()
-    
+
     len = data.length
     sum = 0
     for i in [0..len - 1]
@@ -121,7 +121,7 @@ class Series extends Array
     Series.cleanAccessor()
     unless 0 <= p <= 1.0
       throw new Error "p must in range [0, 1.0] (#{p})"
-    
+
     H = (data.length - 1) * p + 1
     h = Math.floor(H)
     v = +y(data[h - 1])
@@ -162,7 +162,7 @@ class Series extends Array
     meanB = Series.y(y).mean dataB
     Series.cleanAccessor()
     len = Math.min dataA.length, dataB.length
-    
+
     sum = 0
     for i in [0..len - 1]
       sum += (y(dataA[i]) - meanA) * (y(dataB[i]) - meanB)
@@ -187,7 +187,7 @@ class Series extends Array
         data.slice(lag, len).concat(data.slice(0, lag))
       )
     res
-    
+
   @autocorrelation: (data, limit)->
     y = Series.y()
     Series.cleanAccessor()
@@ -201,7 +201,7 @@ class Series extends Array
         data.slice(lag, len).concat(data.slice(0, lag))
       )
     res
-    
+
   @spectrum: ()->
   @movingaverage: ()->
   @ar: ()->
@@ -215,7 +215,7 @@ class Series extends Array
     yKey = Series._yKey or 'y'
     y = Series.y()
     t = Series.y()
-    
+
     key = Series.t()
     sort = null
 
@@ -244,7 +244,7 @@ class Series extends Array
           for ck, c of calc
             Series.y(y).t(t)
             obj[ck] = c(values, args)
-          
+
         aggregated.push obj
 
       if not sort?
@@ -294,7 +294,7 @@ class Series extends Array
     else
       throw new Error 't accessor should be function'
     this
-    
+
   y: (accessor)->
     if not accessor?
       return @_y
@@ -306,12 +306,12 @@ class Series extends Array
     else
       throw new Error 'y accessor should be function'
     this
-    
+
   cleanAccessor: ()->
     @_t = (d)-> d
     @_y = (d)-> d
     this
-    
+
   #
   # ## data put
   #
@@ -418,7 +418,7 @@ do (Series)->
     Y: (d, p)-> formatPad(d.getFullYear() % 10000, p, 4)
     Z: (d)-> d.getTimezoneOffset(),
     "%": ()-> "%"
-    
+
   minute = (time)->
     t = Series.t()
     time = new Date(t(time)) unless time instanceof Date
@@ -459,7 +459,7 @@ class Series.Nest
     @keys = []
     @sortKeys = []
     @sortValues = []
-    
+
   key: (func)->
     @keys.push func
     this
@@ -468,12 +468,12 @@ class Series.Nest
     depth = @keys.length - 1
     @sortKeys[depth] = sort or (a, b)-> a - b
     this
-    
+
   sortValue: (sort)->
     depth = @keys.length - 1
     @sortValues[depth] = sort or (a, b)-> key(a) - key(b)
     this
-    
+
   _map: (data, depth)->
     key = @keys[depth]
 
@@ -486,15 +486,12 @@ class Series.Nest
       for k, v of map
         map[k] = @_map v, depth + 1
     map
-    
+
   map: (data)->
     if not data?
       @logger.warn "no data"
       return null
-    if data.length is 0
-      @logger.warn "data length is 0"
-      return null
-      
+
     @_map data, 0
 
   _entries: (map, depth)->
@@ -502,7 +499,7 @@ class Series.Nest
       return map
     # TODO: calc leavs number
     ({key: k, values: @_entries(v, depth + 1) } for k, v of map)
-    
+
   entries: (data)->
     if not data?
       @logger.warn "no data"
@@ -510,7 +507,7 @@ class Series.Nest
     if data.length is 0
       @logger.warn "data length is 0"
       return null
-      
+
     map = @_map data, 0
     @_entries map, 0
 
