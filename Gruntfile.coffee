@@ -8,17 +8,17 @@ module.exports = (grunt)->
           bare: false
         files:
           'lib/series.js': 'src/series.coffee'
-    
+
     simplemocha:
       all:
         src: 'test/**/*_test.coffee'
       options:
         ui: 'bdd'
         reporter: 'spec'
-        
+
     watch:
       test:
-        files: ['src/*.coffee', 'test/*_test.coffee']
+        files: ['src/*.coffee', 'test/*_test.coffee', 'Gruntfile.coffee']
         tasks: ['simplemocha']
       build:
         files: ['src/*.coffee', 'test/*_test.coffee']
@@ -26,7 +26,7 @@ module.exports = (grunt)->
 
     clean:
       files: ['lib']
-        
+
   grunt.loadNpmTasks 'grunt-simple-mocha'
   grunt.loadNpmTasks 'grunt-contrib-coffee'
   grunt.loadNpmTasks 'grunt-contrib-clean'
@@ -34,4 +34,3 @@ module.exports = (grunt)->
 
   grunt.registerTask 'default', ['simplemocha', 'coffee']
   grunt.registerTask 'test', ['simplemocha']
-      

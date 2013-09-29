@@ -511,6 +511,122 @@ class Series.Nest
     map = @_map data, 0
     @_entries map, 0
 
+############################################################
+# dsv and it's test are borrow from d3.js
+#
+d3_dsv = (delimiter, mimeType) ->
+  reFormat = new RegExp("[\"" + delimiter + "\n]")
+  delimiterCode = delimiter.charCodeAt(0)
+
+  dsv = (url, row, callback) ->
+    if arguments_.length < 3
+      callback = row
+      row = null
+    xhr = d3.xhr(url, mimeType, callback)
+    xhr.row = (_) ->
+      (if arguments_.length then xhr.response((if not (row = _)? then response else typedResponse(_))) else row)
+
+    xhr.row row
+
+  response = (request) ->
+    dsv.parse request.responseText
+
+  typedResponse = (f) ->
+    (request) ->
+      dsv.parse request.responseText, f
+
+  dsv.parse = (text, f) ->
+    o = undefined
+    dsv.parseRows text, (row, i) ->
+      return o(row, i - 1)  if o
+      a = new Function("d", "return {" + row.map((name, i) ->
+        JSON.stringify(name) + ": d[" + i + "]"
+      ).join(",") + "}")
+      o = (if f then (row, i) ->
+        f a(row), i
+      else a)
+      return
+
+  dsv.parseRows = (text, f) ->
+    EOL = {}
+    EOF = {}
+    rows = []
+    N = text.length
+    I = 0
+    n = 0
+    t = undefined
+    eol = undefined
+
+    token = ->
+      return EOF  if I >= N
+      if eol
+        eol = false
+        return EOL
+      j = I
+      if text.charCodeAt(j) is 34 # 34 is quote "
+        i = j
+        while i++ < N
+          if text.charCodeAt(i) is 34
+            break  if text.charCodeAt(i + 1) isnt 34
+            ++i
+        I = i + 2
+        c = text.charCodeAt(i + 1)
+        if c is 13
+          eol = true
+          ++I  if text.charCodeAt(i + 2) is 10
+        else eol = true  if c is 10
+        return text.substring(j + 1, i).replace(/""/g, "\"")
+
+      while I < N
+        c = text.charCodeAt(I++)
+        k = 1
+        if c is 10
+          eol = true
+        else if c is 13
+          eol = true
+          if text.charCodeAt(I) is 10
+            ++I
+            ++k
+        else continue  if c isnt delimiterCode
+        return text.substring(j, I - k)
+      text.substring j
+    while (t = token()) isnt EOF
+      a = []
+      while t isnt EOL and t isnt EOF
+        a.push t
+        t = token()
+      if f and not (a = f(a, n++))
+        continue
+      rows.push a
+    rows
+
+  dsv.format = (rows) ->
+    return dsv.formatRows(rows)  if Array.isArray(rows[0])
+    fieldSet = new d3_Set
+    fields = []
+    rows.forEach (row) ->
+      for field of row
+        fields.push fieldSet.add(field)  unless fieldSet.has(field)
+
+    [fields.map(formatValue).join(delimiter)].concat(rows.map((row) ->
+      fields.map((field) ->
+        formatValue row[field]
+      ).join delimiter
+    )).join "\n"
+
+  dsv.formatRows = (rows) ->
+    rows.map(formatRow).join "\n"
+
+  formatRow = (row) ->
+    row.map(formatValue).join delimiter
+  formatValue = (text) ->
+    (if reFormat.test(text) then "\"" + text.replace(/\"/g, "\"\"") + "\"" else text)
+
+  dsv
+
+Series.csv = d3_dsv(",", "text/csv");
+Series.tsv = d3_dsv("\t", "text/tab-separated-values");
+
 if module?.exports
   module.exports = Series
 else
