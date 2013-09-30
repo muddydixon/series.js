@@ -1,3 +1,40 @@
+############################################################
+# Copyright (c) 2013, Muddy Dixon
+# All rights reserved.
+# Apache License Version 2.0
+#
+# and format / dsv / interpolate parts are borrowed from d3.js
+# [d3.js](https://github.com/mbostock/d3/wiki/Time-Formatting)
+# LICENSE of d3.js is followed bellow:
+#
+# Copyright (c) 2013, Michael Bostock
+# All rights reserved.
+
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+
+# * Redistributions of source code must retain the above copyright notice, this
+#   list of conditions and the following disclaimer.
+
+# * Redistributions in binary form must reproduce the above copyright notice,
+#   this list of conditions and the following disclaimer in the documentation
+#   and/or other materials provided with the distribution.
+
+# * The name Michael Bostock may not be used to endorse or promote products
+#   derived from this software without specific prior written permission.
+
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL MICHAEL BOSTOCK BE LIABLE FOR ANY DIRECT,
+# INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+# BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
+# OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+# NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+# EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
 class Series extends Array
   @_t: (d)-> d
   @_y: (d)-> d
@@ -348,9 +385,7 @@ class Series extends Array
     Series.y(@y()).aggregation(calc)
 
 #
-# ## time format / parse method
-#
-# Below code is borrowed in [d3.js](https://github.com/mbostock/d3/wiki/Time-Formatting)
+# format and it's test are borrow from d3.js
 #
 do (Series)->
   # time
@@ -627,6 +662,47 @@ d3_dsv = (delimiter, mimeType) ->
 Series.csv = d3_dsv(",", "text/csv");
 Series.tsv = d3_dsv("\t", "text/tab-separated-values");
 
+############################################################
+# interpolate and it's test are borrow from d3.js
+#
+d3_interpolateNumber = (a, b)->
+  b -= a = +a
+  return (t)->
+    a + b * t
+
+Series.interpolators = [
+  (a, b)->
+    t = typeof b
+    (if t is "object" then d3_interpolateArray else d3_interpolateNumber)(a, b)
+]
+
+Series.interpolate = d3_interpolate = (a, b)->
+  i = Series.interpolators.length
+  f = undefined
+
+  while (--i >= 0 and not (f = Series.interpolators[i](a, b)))
+    1
+  f
+
+Series.interpolateArray = d3_interpolateArray = (a, b)->
+  x = []
+  c = []
+  na = a.length
+  nb = b.length
+  n0 = Math.min(a.length, b.length)
+  i = undefined
+
+  for i in [0 .. n0 - 1]
+    x.push(d3_interpolate(a[i], b[i]))
+  c[i] = a[i] for i in [n0 .. na - 1] if n0 < na
+  c[i] = b[i] for i in [na .. nb - 1] if na < nb
+
+  (t)->
+    for i in [0 .. n0 - 1]
+      c[i] = x[i](t)
+    c
+
+############################################################
 if module?.exports
   module.exports = Series
 else
