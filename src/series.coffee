@@ -537,7 +537,7 @@ d3_dsv = (delimiter, mimeType) ->
 
   dsv.parse = (text, f) ->
     o = undefined
-    dsv.parseRows text, (row, i) ->
+    return dsv.parseRows text, (row, i) ->
       return o(row, i - 1)  if o
       a = new Function("d", "return {" + row.map((name, i) ->
         JSON.stringify(name) + ": d[" + i + "]"

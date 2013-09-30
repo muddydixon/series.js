@@ -10,6 +10,9 @@ describe 'series', ->
       "return array of object":
         csv: 'a,b,c\n1,2,3\n'
         obj: [{a: "1", b: "2", c: "3"}]
+      "return array of object (CRLF)":
+        csv: 'a,b,c\r\n1,2,3\r\n'
+        obj: [{a: "1", b: "2", c: "3"}]
       "not strip whitespace":
         csv: "a,b,c\n 1, 2,3\n"
         obj: [{a: " 1", b: " 2", c: "3"}]
