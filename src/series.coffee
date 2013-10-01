@@ -112,8 +112,10 @@ class Series extends Array
 
     i = 0
     while i < maxlen
-      zipped.push zipped, (arr[i] or null for arr in arrs)
+      zipped.push (arr[i] or null for arr in arrs)
+      i++
     zipped
+
   @transpose: (data)->
   @nullTo: (data, val)->
 
