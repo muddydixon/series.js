@@ -36,6 +36,7 @@
 
 
 class Series extends Array
+  @logger = console.log
   @_t: (d)-> d
   @_y: (d)-> d
   @_ys: null
@@ -526,7 +527,6 @@ class Series.Nest
 
   map: (data)->
     if not data?
-      @logger.warn "no data"
       return null
 
     @_map data, 0
@@ -539,10 +539,8 @@ class Series.Nest
 
   entries: (data)->
     if not data?
-      @logger.warn "no data"
       return null
     if data.length is 0
-      @logger.warn "data length is 0"
       return null
 
     map = @_map data, 0
