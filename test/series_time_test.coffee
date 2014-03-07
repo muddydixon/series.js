@@ -16,7 +16,7 @@ describe 'series', ->
       do (method, answer)->
         it "time interval #{method}", ->
           expect(Series[method](testDate)).to.be.deep.eql answer
-          
+
   describe 'time format methods', ->
     testDate = new Date(2013, 7, 20, 14, 45, 23, 128)
     samples =
@@ -40,7 +40,7 @@ describe 'series', ->
       '%X': '14:45:23'
       '%y': '13'
       '%Y': '2013'
-      '%Z': '-540'
+      # '%Z': '-540'
       '%%': '%'
       '%Y-%m-%d': '2013-08-20'
       '%Y/%m/%d': '2013/08/20'
@@ -52,4 +52,3 @@ describe 'series', ->
         it "format(#{f})", ->
           format = Series.format(f)
           expect(format(testDate)).to.be.eql answer
-        
