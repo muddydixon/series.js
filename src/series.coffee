@@ -410,6 +410,7 @@ do (Series)->
   Series.format = (template)->
     n = template.length
     format = (date)->
+      return undefined if not date.getTime? or isNaN(date.getTime())
       string = []
       i = -1
       j = 0
