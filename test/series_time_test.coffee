@@ -18,37 +18,45 @@ describe 'series', ->
           expect(Series[method](testDate)).to.be.deep.eql answer
 
   describe 'time format methods', ->
-    testDate = new Date(2013, 7, 20, 14, 45, 23, 128)
-    samples =
-      '%a': 'Tue'
-      '%A': 'Tuesday'
-      '%b': 'Aug'
-      '%B': 'August'
-      '%c': 'Tue Aug 20 14:45:23 2013'
-      '%d': '20'
-      '%e': '20'
-      '%H': '14'
-      '%I': '02'
-      '%j': '232'
-      '%L': '128'
-      '%m': '08'
-      '%M': '45'
-      '%p': 'PM'
-      '%S': '23'
-      '%w': '2'
-      '%x': '08/20/2013'
-      '%X': '14:45:23'
-      '%y': '13'
-      '%Y': '2013'
-      # '%Z': '-540'
-      '%%': '%'
-      '%Y-%m-%d': '2013-08-20'
-      '%Y/%m/%d': '2013/08/20'
-      '%H %M %S': '14 45 23'
-      '%%%H': '%14'
+    describe "normal data", ->
+      testDate = new Date(2013, 7, 20, 14, 45, 23, 128)
+      samples =
+        '%a': 'Tue'
+        '%A': 'Tuesday'
+        '%b': 'Aug'
+        '%B': 'August'
+        '%c': 'Tue Aug 20 14:45:23 2013'
+        '%d': '20'
+        '%e': '20'
+        '%H': '14'
+        '%I': '02'
+        '%j': '232'
+        '%L': '128'
+        '%m': '08'
+        '%M': '45'
+        '%p': 'PM'
+        '%S': '23'
+        '%w': '2'
+        '%x': '08/20/2013'
+        '%X': '14:45:23'
+        '%y': '13'
+        '%Y': '2013'
+        # '%Z': '-540'
+        '%%': '%'
+        '%Y-%m-%d': '2013-08-20'
+        '%Y/%m/%d': '2013/08/20'
+        '%H %M %S': '14 45 23'
+        '%%%H': '%14'
 
-    for f, answer of samples
-      do (f, answer)->
-        it "format(#{f})", ->
-          format = Series.format(f)
-          expect(format(testDate)).to.be.eql answer
+      for f, answer of samples
+        do (f, answer)->
+          it "format(#{f})", ->
+            format = Series.format(f)
+            expect(format(testDate)).to.be.eql answer
+
+    describe "invalid date", ->
+      format = Series.format("%Y-%m-%d")
+      it "string", ->
+        expect(format("2014-05-02")).to.be.eql undefined
+      it "string", ->
+        expect(format(new Date("2014-05-02a"))).to.be.eql undefined
