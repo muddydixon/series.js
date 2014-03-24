@@ -7,7 +7,7 @@
     "test": "test"
   },
   "scripts": {
-    "test": "mocha --compilers coffee:coffee-script -R spec test/*_test.coffee"
+    "test": "mocha test/*_test.coffee"
   },
   "repository": "https://github.com/muddydixon/series.js.git",
   "author": "muddydixon muddydixon@gmail.com",
