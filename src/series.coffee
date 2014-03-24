@@ -496,21 +496,29 @@ do (Series)->
 class Series.Nest
   constructor: ()->
     @keys = []
-    @sortKeys = []
-    @sortValues = []
+    @_sortKeys = []
+    @_sortValues = undefined
 
   key: (func)->
-    @keys.push func
+    unless func?
+      return @keys
+    if typeof func is 'function'
+      @keys.push func
+    else
+      @keys.push (d)-> d[func]
     this
 
-  sortKey: (sort)->
+  sortKeys: (sort)->
+    unless sort?
+      return @_sortKeys
     depth = @keys.length - 1
-    @sortKeys[depth] = sort or (a, b)-> a - b
+    @_sortKeys[depth] = sort
     this
 
-  sortValue: (sort)->
-    depth = @keys.length - 1
-    @sortValues[depth] = sort or (a, b)-> key(a) - key(b)
+  sortValues: (sort)->
+    unless sort?
+      return @_sortValues
+    @_sortValues = sort
     this
 
   _map: (data, depth)->
@@ -524,6 +532,11 @@ class Series.Nest
     if @keys.length > depth + 1
       for k, v of map
         map[k] = @_map v, depth + 1
+    else
+      if @_sortValues?
+        for k, dat of map
+          map[k].sort @_sortValues
+
     map
 
   map: (data)->
@@ -535,8 +548,14 @@ class Series.Nest
   _entries: (map, depth)->
     if @keys.length < depth + 1
       return map
-    # TODO: calc leavs number
-    ({key: k, values: @_entries(v, depth + 1) } for k, v of map)
+
+    keys = Object.keys(map)
+    if @_sortKeys[depth]?
+      keys.sort(@_sortKeys[depth])
+
+    values = ({key: k, values: @_entries(map[k], depth + 1) } for k in keys)
+
+    values
 
   entries: (data)->
     if not data?
