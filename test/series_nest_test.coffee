@@ -190,6 +190,49 @@ describe 'series', ->
               { gender: 0, age: 0 }
               ]
             }
+        it 'rollup values', ->
+          nest = Series.nest().key((d)-> d.age).rollup((values)-> values.length)
+          expect(nest.map(data)).to.be.deep.equal {
+            0: 3
+            1: 2
+            2: 2
+            3: 2
+            4: 2
+            }
+        it 'rollup values more complex function', ->
+          nest = Series.nest().key((d)-> d.age)
+            .rollup((values)-> values.reduce(((p, c)-> p + c.age), 1))
+          expect(nest.map(data)).to.be.deep.equal {
+            0: 1
+            1: 3
+            2: 5
+            3: 7
+            4: 9
+            }
+        it 'rollup values for two keys', ->
+          nest = Series.nest().key((d)-> d.age).key((d)-> d.gender).rollup((values)-> values.length)
+          expect(nest.map(data)).to.be.deep.equal {
+            0: {
+              0: 2
+              1: 1
+              }
+            1: {
+              1: 1
+              0: 1
+              }
+            2: {
+              0: 1
+              1: 1
+              }
+            3: {
+              1: 1
+              0: 1
+              }
+            4: {
+              0: 1
+              1: 1
+              }
+            }
       describe 'return entries', ->
         data = [0..10].map (d)->
           gender: d % 2
