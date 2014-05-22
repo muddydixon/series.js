@@ -498,6 +498,7 @@ class Series.Nest
     @keys = []
     @_sortKeys = []
     @_sortValues = undefined
+    @_rollup = undefined
 
   key: (func)->
     unless func?
@@ -521,6 +522,12 @@ class Series.Nest
     @_sortValues = sort
     this
 
+  rollup: (rollup)->
+    unless rollup?
+      return @_rollup
+    @_rollup = rollup
+    this
+
   _map: (data, depth)->
     key = @keys[depth]
 
@@ -533,7 +540,10 @@ class Series.Nest
       for k, v of map
         map[k] = @_map v, depth + 1
     else
-      if @_sortValues?
+      if @_rollup?
+        for k, dat of map
+          map[k] = @_rollup(dat)
+      else if @_sortValues?
         for k, dat of map
           map[k].sort @_sortValues
 
